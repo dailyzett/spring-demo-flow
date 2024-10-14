@@ -12,10 +12,6 @@ class UserJpo (
 
     var currentBalance: Int
 ) {
-    fun subtractFromBalance(amount: Int) {
-        this.currentBalance -= amount
-    }
-
     override fun toString(): String {
         return "UserJpo(email='$email', currentBalance=$currentBalance)"
     }
