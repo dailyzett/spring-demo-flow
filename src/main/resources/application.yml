@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: paymentdemo
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/demo
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
