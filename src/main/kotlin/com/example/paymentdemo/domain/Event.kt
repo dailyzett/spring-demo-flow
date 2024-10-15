@@ -6,4 +6,9 @@ open class Event {
 data class PaymentEvent(
     val userEmail: String,
     val amount: Int,
-): Event()
+) : Event()
+
+data class TestEvent(
+    val eventName: String,
+    val eventDescription: String,
+) : Event()
