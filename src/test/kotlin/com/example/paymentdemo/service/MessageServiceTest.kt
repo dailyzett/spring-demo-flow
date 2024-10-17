@@ -2,8 +2,7 @@ package com.example.paymentdemo.service
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,6 +20,12 @@ suspend fun <T> Flow<T>.toListDuring(
     delay(duration)
     job.cancel()
     return@coroutineScope result
+}
+
+private val infiniteFlow = flow<Nothing> {
+    while (true) {
+        delay(100)
+    }
 }
 
 class MessageServiceTest {
@@ -45,5 +50,26 @@ class MessageServiceTest {
                 Message("0", "C"),
             ), emittedMessages
         )
+    }
+
+    @Test
+    fun `should start at most one connection`() = runTest {
+        var connectionsCounter = 0
+        val source = infiniteFlow
+            .onStart { connectionsCounter++ }
+            .onCompletion { connectionsCounter-- }
+
+        val service = MessageService(
+            messageSource = source,
+            scope = backgroundScope
+        )
+
+        service.observeMessages("0").launchIn(backgroundScope)
+        service.observeMessages("1").launchIn(backgroundScope)
+        service.observeMessages("0").launchIn(backgroundScope)
+        service.observeMessages("2").launchIn(backgroundScope)
+        delay(1000)
+
+        assertEquals(1, connectionsCounter)
     }
 }
